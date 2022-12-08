@@ -8,7 +8,7 @@ crsr = connection.cursor();
 print("Connected to the database")
 # SQL command to create a table in the database
 createPubInfoTable = """CREATE TABLE IF NOT EXISTS PUBLISHER_INFO(
-  pid       INT PRIMARY KEY,
+  pid       INTEGER PRIMARY KEY AUTOINCREMENT,
   name      VARCHAR(255),
   address   VARCHAR(255),
   email     VARCHAR(255),
@@ -52,7 +52,7 @@ createAuthorTable = """CREATE TABLE IF NOT EXISTS AUTHORS(
 crsr.execute(createAuthorTable);
 
 createCCTable = """CREATE TABLE IF NOT EXISTS CREDIT_CARD(
-  cid         INT PRIMARY KEY,
+  cid         INTEGER PRIMARY KEY AUTOINCREMENT,
   card_num    CHAR(10) NOT NULL,
   name        VARCHAR(255) NOT NULL,
   postal_code CHAR(6) NOT NULL
@@ -60,7 +60,7 @@ createCCTable = """CREATE TABLE IF NOT EXISTS CREDIT_CARD(
 crsr.execute(createCCTable);
 
 createUserTable = """CREATE TABLE IF NOT EXISTS USER_TABLE(
-  uid           INT PRIMARY KEY,
+  uid           INTEGER PRIMARY KEY AUTOINCREMENT,
   email         VARCHAR(255) NOT NULL UNIQUE,
   password      VARCHAR(20) NOT NULL,
   address       VARCHAR(255),
@@ -72,7 +72,7 @@ createUserTable = """CREATE TABLE IF NOT EXISTS USER_TABLE(
 crsr.execute(createUserTable);
 
 createOrderTable = """CREATE TABLE IF NOT EXISTS ORDER_TABLE(
-  onum            INT PRIMARY KEY,
+  onum            INTEGER PRIMARY KEY AUTOINCREMENT,
   tracking_num    INT,
   uid             INT,
   payment         INT,
@@ -94,7 +94,7 @@ createContainsTable = """CREATE TABLE IF NOT EXISTS ORDER_CONTAINS(
 );"""
 crsr.execute(createContainsTable);
 
-admin_account = """INSERT INTO USER_TABLE(uid, email, password, is_admin) VALUES (1, 'admin@thebookstore.com', 'grbookworm1818', 1);"""
+admin_account = """INSERT INTO USER_TABLE(email, password, is_admin) VALUES ('admin@thebookstore.com', 'grbookworm1818', 1);"""
 crsr.execute(admin_account);
 connection.commit();
 # close the connection
