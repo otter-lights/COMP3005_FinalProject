@@ -61,7 +61,7 @@ crsr.execute(createCCTable);
 
 createUserTable = """CREATE TABLE IF NOT EXISTS USER_TABLE(
   uid           INT PRIMARY KEY,
-  email         VARCHAR(255) NOT NULL,
+  email         VARCHAR(255) NOT NULL UNIQUE,
   password      VARCHAR(20) NOT NULL,
   address       VARCHAR(255),
   default_card  INT,
@@ -94,5 +94,8 @@ createContainsTable = """CREATE TABLE IF NOT EXISTS ORDER_CONTAINS(
 );"""
 crsr.execute(createContainsTable);
 
+admin_account = """INSERT INTO USER_TABLE(uid, email, password, is_admin) VALUES (1, 'admin@thebookstore.com', 'grbookworm1818', 1);"""
+crsr.execute(admin_account);
+connection.commit();
 # close the connection
 connection.close();
