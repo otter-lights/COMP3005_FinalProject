@@ -8,22 +8,42 @@ logged_in = False
 is_admin = False
 
 def browse():
-    search_type = input("Would you like to search by: \n (1) title \n (2) ISBN \n (3) author name \n (4) genre \n ")
-    if(search_type == "1"):
-        print("search by title")
-    elif(search_type == "2"):
-        print("search by ISBN")
-
-    elif(search_type == "3"):
-        name = input("Author Name: ")
-        crsr.execute("SELECT title, year_pub, num_pages,author_name, price FROM BOOK JOIN AUTHORS ON BOOK.ISBN=AUTHORS.ISBN WHERE author_name=?", (name,))
-        print(crsr.fetchall())
-        #need to make way to select
-    elif(search_type == "4"):
-        print("search by genre")
-    else:
-        print("input was not understood, please try again")
-    print("Browsing the Collection...")
+    while(True):
+        search_type = input("Would you like to search by: \n (1) title \n (2) ISBN \n (3) author name \n (4) genre \n ")
+        if(search_type == "1"):
+            title = input("Title: ")
+            crsr.execute("SELECT title, year_pub, price FROM BOOK WHERE title=?", (title,))
+            print(crsr.fetchall())
+        elif(search_type == "2"):
+            while(True):
+                isbn = input("ISBN (10 Digits): ")
+                if(len(isbn) != 10):
+                    print("incorrect length, try again")
+                    continue
+                break
+            crsr.execute("SELECT title, year_pub, price FROM BOOK WHERE ISBN=?", (int(isbn),))
+            #crsr.execute("SELECT ISBN, title, year_pub, price FROM BOOK WHERE ISBN=0062457799")
+            print(crsr.fetchall())
+        elif(search_type == "3"):
+            name = input("Author Name: ")
+            crsr.execute("SELECT title, year_pub, price FROM BOOK JOIN AUTHORS ON BOOK.ISBN=AUTHORS.ISBN WHERE author_name=?", (name,))
+            print(crsr.fetchall())
+        elif(search_type == "4"):
+            genre = input("Genre: ")
+            crsr.execute("SELECT title, year_pub, price FROM BOOK JOIN GENRES ON BOOK.ISBN=GENRES.ISBN WHERE genre=?", (genre,))
+            print(crsr.fetchall())
+        else:
+            print("input was not understood, please try again")
+            continue
+        end = input(" (1) Return To Menu \n (2) New Search \n ")
+        if(end == "1"):
+            print("Returning To Menu ...")
+            break
+        elif(end == "2"):
+            continue
+        else:
+            print("input was not understood, returning to menu")
+            break
 
 def login():
     email = input("Email: ")
