@@ -8,6 +8,21 @@ logged_in = False
 is_admin = False
 
 def browse():
+    search_type = input("Would you like to search by: \n (1) title \n (2) ISBN \n (3) author name \n (4) genre \n ")
+    if(search_type == "1"):
+        print("search by title")
+    elif(search_type == "2"):
+        print("search by ISBN")
+
+    elif(search_type == "3"):
+        name = input("Author Name: ")
+        crsr.execute("SELECT title, year_pub, num_pages,author_name, price FROM BOOK JOIN AUTHORS ON BOOK.ISBN=AUTHORS.ISBN WHERE author_name=?", (name,))
+        print(crsr.fetchall())
+        #need to make way to select
+    elif(search_type == "4"):
+        print("search by genre")
+    else:
+        print("input was not understood, please try again")
     print("Browsing the Collection...")
 
 def login():
@@ -67,6 +82,22 @@ def createaccount():
     print("Creating Account...")
     return(new_user)
 
+def addbooks():
+    while(True):
+        #ask ISBN
+        #ask title
+        #ask year_pub and num_pages (optional)
+        #ask author(s)
+        #ask genre(s)
+        #ask price
+        #ask stock
+        #ask publisher name (and look up), if not exist make new PUBLISHER_INFO
+        #ask pub_cut
+
+        end = input("Would you like to add another book? (y/n) ")
+        if(end == "n" or end == "N"):
+            break
+
 def viewcart():
     print("Viewing Cart...")
 
@@ -88,12 +119,14 @@ while(True):
             print("Sorry, we didn't understand that input. Please choose from the options below: ")
             continue;
     elif(logged_in != False and is_admin == True):
-        option = input(" (1) Browse Our Collection \n (2) View Reports \n (3) Exit Store \n")
+        option = input(" (1) Browse Our Collection \n (2) View Reports \n (3) Add Books \n (4) Exit Store \n")
         if(option == "1"):
             browse()
         elif(option == "2"):
             viewreports()
         elif(option == "3"):
+            addbooks()
+        elif(option == "4"):
             print("Exiting Program ...")
             break;
         else:
