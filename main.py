@@ -7,13 +7,23 @@ crsr = connection.cursor();
 logged_in = False
 is_admin = False
 
+def selection(results):
+    for i in range(1, len(results)+1):
+        print(i, results[i-1])
+    selection = input("Enter number of book to select: ")
+    if(selection.isdigit() and int(selection) < len(results)+1):
+        print("Selection: ", results[int(selection)-1])
+        # SHOW ALL INFO AND GIVE OPTIONS
+    else:
+        print("input not understood, ending search")
+
 def browse():
     while(True):
         search_type = input("Would you like to search by: \n (1) title \n (2) ISBN \n (3) author name \n (4) genre \n ")
         if(search_type == "1"):
             title = input("Title: ")
             crsr.execute("SELECT title, year_pub, price FROM BOOK WHERE title=?", (title,))
-            print(crsr.fetchall())
+            selection(crsr.fetchall())
         elif(search_type == "2"):
             while(True):
                 isbn = input("ISBN (10 Digits): ")
@@ -23,19 +33,20 @@ def browse():
                 break
             crsr.execute("SELECT title, year_pub, price FROM BOOK WHERE ISBN=?", (int(isbn),))
             #crsr.execute("SELECT ISBN, title, year_pub, price FROM BOOK WHERE ISBN=0062457799")
-            print(crsr.fetchall())
+            selection(crsr.fetchall())
         elif(search_type == "3"):
             name = input("Author Name: ")
             crsr.execute("SELECT title, year_pub, price FROM BOOK JOIN AUTHORS ON BOOK.ISBN=AUTHORS.ISBN WHERE author_name=?", (name,))
-            print(crsr.fetchall())
+            selection(crsr.fetchall())
         elif(search_type == "4"):
             genre = input("Genre: ")
             crsr.execute("SELECT title, year_pub, price FROM BOOK JOIN GENRES ON BOOK.ISBN=GENRES.ISBN WHERE genre=?", (genre,))
-            print(crsr.fetchall())
+            selection(crsr.fetchall())
+            #print(results)
         else:
             print("input was not understood, please try again")
             continue
-        end = input(" (1) Return To Menu \n (2) New Search \n ")
+        end = input(" (1) Return To Menu \n (2) New Search \n ") #POTENTIALLY ADD OPTION TO REDO LAST SEARCH
         if(end == "1"):
             print("Returning To Menu ...")
             break
