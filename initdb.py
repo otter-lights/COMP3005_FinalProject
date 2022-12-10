@@ -21,8 +21,8 @@ crsr.execute(createPubInfoTable);
 createBookTable = """CREATE TABLE IF NOT EXISTS BOOK(
   ISBN      CHAR(10) PRIMARY KEY,
   title     VARCHAR(255) NOT NULL,
-  year_pub  INT,
-  num_pages INT,
+  year_pub  INT NOT NULL,
+  num_pages INT NOT NULL,
   price     DECIMAL(10,2) NOT NULL,
   stock     INT NOT NULL,
   sales     INT,

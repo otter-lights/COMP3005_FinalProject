@@ -6,6 +6,7 @@ crsr = connection.cursor();
 
 logged_in = False
 is_admin = False
+cart = []
 
 def selection(results):
     for i in range(1, len(results)+1):
@@ -48,6 +49,17 @@ def selection(results):
         else:
             print(" Status: Out of Stock")
 
+        if(logged_in != False and is_admin == False):
+            add = input(f"Would you like to add {info[1]} to cart? (y/n) ")
+            if(add == "y" or add == "Y"):
+                cart.append([info[0], info[1], info[4]]);
+                print("Added to Cart", info[0])
+        elif(logged_in != False and is_admin == True):
+            #delete BOOK
+            print("admin")
+        else:
+            #not logged in
+            print("Add to Cart Not Available (Not Logged In). Returning to Search Menu...")
         #GIVE OPTIONS
         print("\n")
     else:
@@ -165,8 +177,35 @@ def addbooks():
         if(end == "n" or end == "N"):
             break
 
+def checkout():
+    print("Checking Out...")
+
 def viewcart():
-    print("Viewing Cart...")
+    if(cart):
+        total = 0
+        for i in range(len(cart)):
+            print(i+1, cart[i][1], cart[i][2])
+            total += cart[i][2]
+        print("-----\nTotal: ", total)
+        remove = input("Would you like to remove a book? (y/n)")
+        if(remove == "y" or remove == "Y"):
+            remove = input("Type number corresponding to book to remove from cart: ")
+            if(remove.isdigit() and int(remove) <= len(remove)+1):
+                cart.pop(int(remove)-1)
+                viewcart()
+                return()
+            else:
+                print("Choice not understood...")
+                viewcart()
+                return()
+        cout = input("Would you like to check out now? (y/n) ")
+        if(cout == "y" or cout == "Y"):
+            checkout()
+        else:
+            print("Returning to Menu...")
+    else:
+        print("Cart is Empty. Returning to Menu ...")
+        return()
 
 def viewreports():
     print("Viewing Reports...")
@@ -200,17 +239,15 @@ while(True):
             print("Sorry, we didn't understand that input. Please choose from the options below: ")
             continue;
     else:
-        option = input(" (1) Browse Our Collection \n (2) View Cart \n (3) Log In \n (4) Create a New Account \n (5) Exit Store \n")
+        option = input(" (1) Browse Our Collection \n (2) Log In \n (3) Create a New Account \n (4) Exit Store \n")
         #print(option)
         if(option == "1"):
             browse()
         elif(option == "2"):
-            viewcart()
-        elif(option == "3"):
             logged_in, is_admin = login()
-        elif(option == "4"):
+        elif(option == "3"):
             logged_in = createaccount()
-        elif(option == "5"):
+        elif(option == "4"):
             print("Exiting Program ...")
             break;
         else:
