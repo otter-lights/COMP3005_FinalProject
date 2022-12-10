@@ -9,11 +9,47 @@ is_admin = False
 
 def selection(results):
     for i in range(1, len(results)+1):
-        print(i, results[i-1])
+        book = results[i-1]
+        isbn = book[0]
+        print(i, book[1], book[2])
     selection = input("Enter number of book to select: ")
     if(selection.isdigit() and int(selection) < len(results)+1):
-        print("Selection: ", results[int(selection)-1])
-        # SHOW ALL INFO AND GIVE OPTIONS
+        choice = results[int(selection)-1]
+        isbn = choice[0]
+        crsr.execute("SELECT * FROM BOOK WHERE isbn=?", (isbn,))
+        info = crsr.fetchone()
+        crsr.execute("SELECT author_name FROM AUTHORS WHERE isbn=?", (isbn,))
+        authors = crsr.fetchall()
+        author_str = " Authors: "
+        for i in range(len(authors)):
+            if(i == len(authors)-1):
+                author_str += str(authors[i][0])
+            else:
+                author_str += str(authors[i][0]) + " & "
+
+        crsr.execute("SELECT genre FROM GENRES WHERE isbn=?", (isbn,))
+        genres = crsr.fetchall()
+        genre_str = " Genres: "
+        for i in range(len(genres)):
+            if(i == len(genres)-1):
+                genre_str += str(genres[i][0])
+            else:
+                genre_str += str(genres[i][0]) + ", "
+
+        print(" Title: ", info[1])
+        print(author_str)
+        print(genre_str)
+        print(" Price: ", info[4])
+        print(" ISBN: ", info[0])
+        print(" Year Published: ", info[2])
+        print(" Number of Pages: ", info[3])
+        if(info[5] > 0):
+            print(" Status: In Stock")
+        else:
+            print(" Status: Out of Stock")
+
+        #GIVE OPTIONS
+        print("\n")
     else:
         print("input not understood, ending search")
 
@@ -22,7 +58,7 @@ def browse():
         search_type = input("Would you like to search by: \n (1) title \n (2) ISBN \n (3) author name \n (4) genre \n ")
         if(search_type == "1"):
             title = input("Title: ")
-            crsr.execute("SELECT title, year_pub, price FROM BOOK WHERE title=?", (title,))
+            crsr.execute("SELECT ISBN, title, price FROM BOOK WHERE title=?", (title,))
             selection(crsr.fetchall())
         elif(search_type == "2"):
             while(True):
@@ -31,16 +67,16 @@ def browse():
                     print("incorrect length, try again")
                     continue
                 break
-            crsr.execute("SELECT title, year_pub, price FROM BOOK WHERE ISBN=?", (int(isbn),))
+            crsr.execute("SELECT ISBN, title, price FROM BOOK WHERE ISBN=?", (int(isbn),))
             #crsr.execute("SELECT ISBN, title, year_pub, price FROM BOOK WHERE ISBN=0062457799")
             selection(crsr.fetchall())
         elif(search_type == "3"):
             name = input("Author Name: ")
-            crsr.execute("SELECT title, year_pub, price FROM BOOK JOIN AUTHORS ON BOOK.ISBN=AUTHORS.ISBN WHERE author_name=?", (name,))
+            crsr.execute("SELECT BOOK.ISBN, title, price FROM BOOK JOIN AUTHORS ON BOOK.ISBN=AUTHORS.ISBN WHERE author_name=?", (name,))
             selection(crsr.fetchall())
         elif(search_type == "4"):
             genre = input("Genre: ")
-            crsr.execute("SELECT title, year_pub, price FROM BOOK JOIN GENRES ON BOOK.ISBN=GENRES.ISBN WHERE genre=?", (genre,))
+            crsr.execute("SELECT BOOK.ISBN, title, price FROM BOOK JOIN GENRES ON BOOK.ISBN=GENRES.ISBN WHERE genre=?", (genre,))
             selection(crsr.fetchall())
             #print(results)
         else:
