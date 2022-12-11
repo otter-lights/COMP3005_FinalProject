@@ -409,8 +409,8 @@ def trackorder():
         trackorder()
 
 while(True):
-    print("\nWelcome to TheBookStore.\nPlease choose an option from the following menu: ")
     if(logged_in != False and is_admin == False):
+        print("\nWelcome to TheBookStore.", logged_in, "\nPlease choose an option from the following menu: ")
         option = input(" (1) Browse Our Collection \n (2) View Cart \n (3) Track Order \n (4) Exit Store \n")
         if(option == "1"):
             browse()
@@ -425,6 +425,7 @@ while(True):
             print("Sorry, we didn't understand that input. Please choose from the options below: ")
             continue;
     elif(logged_in != False and is_admin == True):
+        print("\nWelcome to TheBookStore [ADMIN VIEW].", logged_in, "\nPlease choose an option from the following menu: ")
         option = input(" (1) Browse Our Collection \n (2) View Reports \n (3) Add Books \n (4) Exit Store \n")
         if(option == "1"):
             browse()
@@ -439,6 +440,7 @@ while(True):
             print("Sorry, we didn't understand that input. Please choose from the options below: ")
             continue;
     else:
+        print("\nWelcome to TheBookStore. \nPlease choose an option from the following menu: ")
         option = input(" (1) Browse Our Collection \n (2) Log In \n (3) Create a New Account \n (4) Exit Store \n")
         #print(option)
         if(option == "1"):

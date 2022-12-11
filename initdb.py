@@ -29,6 +29,7 @@ createBookTable = """CREATE TABLE IF NOT EXISTS BOOK(
   pub_cut   DECIMAl(10,2) NOT NULL,
   FOREIGN KEY(pub_name)
     REFERENCES Publisher_Info(name)
+    ON DELETE CASCADE
 );"""
 crsr.execute(createBookTable);
 
