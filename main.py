@@ -299,7 +299,6 @@ def checkout(total):
             else:
                 print("Error with Payment. Returning to Menu...")
                 return()
-        print("CARD ID: ", payment)
     else:
         makecard = input("Would you like to input a new card? (y/n) ")
         if(makecard == "y" or makecard == "Y"):
@@ -323,9 +322,7 @@ def checkout(total):
     new_onum = crsr.execute('SELECT MAX(onum) FROM ORDER_TABLE').fetchone()[0]
 
     for i in range(len(cart)):
-        print(new_onum, cart[i][0], cartq[cart[i][0]])
-        crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(?,?, 1);", (new_onum, cart[i][0]))
-        print(new_onum, cart[i][0])
+        crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(?,?,?);", (new_onum, cart[i][0], cartq[cart[i][0]]))
 
     connection.commit()
     cart.clear()

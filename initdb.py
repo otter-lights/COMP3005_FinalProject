@@ -160,10 +160,11 @@ crsr.execute("""
 CREATE TRIGGER reorder_check
   AFTER UPDATE ON BOOK WHEN New.stock < 5
   BEGIN
-    UPDATE BOOK SET stock = (SELECT SUM(ORDER_CONTAINS.quantity)
-                                    FROM ORDER_CONTAINS JOIN ORDER_TABLE ON ORDER_CONTAINS.onum = ORDER_TABLE.onum
-                                    WHERE ORDER_CONTAINS.ISBN = New.ISBN AND strftime('%Y-%m', date_placed) = strftime('%Y-%m', DATETIME('NOW')))
-                       WHERE BOOK.ISBN = NEW.ISBN;
+    UPDATE BOOK
+    SET stock = (SELECT SUM(ORDER_CONTAINS.quantity)
+                 FROM ORDER_CONTAINS JOIN ORDER_TABLE ON ORDER_CONTAINS.onum = ORDER_TABLE.onum
+                 WHERE ORDER_CONTAINS.ISBN = New.ISBN AND strftime('%Y-%m', date_placed) = strftime('%Y-%m', DATETIME('NOW')))
+    WHERE BOOK.ISBN = NEW.ISBN;
   END;
 """)
 
