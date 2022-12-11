@@ -6,6 +6,7 @@ crsr = connection.cursor();
 logged_in = False
 is_admin = False
 cart = []
+cartq = {}
 
 def selection(results):
     for i in range(1, len(results)+1):
@@ -51,7 +52,11 @@ def selection(results):
         if(logged_in != False and is_admin == False):
             add = input(f"Would you like to add {info[1]} to cart? (y/n) ")
             if(add == "y" or add == "Y"):
-                cart.append([info[0], info[1], info[4]]);
+                if(info[0] not in cartq):
+                    cartq[info[0]] = 1
+                    cart.append([info[0], info[1], info[4], 1]);
+                else:
+                    cartq[info[0]] += 1
                 print("Added to Cart", info[0])
         elif(logged_in != False and is_admin == True):
             delete = input(f"Would you like to delete {info[1]} from store? (y/n) ")
@@ -251,21 +256,61 @@ def addbooks():
         if(end == "n" or end == "N"):
             break
 
-def checkout():
+def checkout(total):
+    default = input("Would you like to use your default card to check out? (y/n) ")
+    if(default == "y" or default == "Y"):
+        crsr.execute("SELECT default_card FROM USER_TABLE WHERE username=?;", (logged_in,))
+        payment = crsr.fetchone()[0]
+        print("CARD ID: ", payment)
+    else:
+        makecard = input("Would you like to input a new card? (y/n) ")
+        if(markcard == "y" or markcard == "Y"):
+            while(True):
+                c = input("Card Number (10 Characters): ")
+                if(len(c) == 10):
+                    break
+            n = input("Name on Card: ")
+            while(True):
+                pc = input("Postal Code for Card (6 Characters): ")
+                if(len(pc) == 6):
+                    break
+
+            crsr.execute('INSERT INTO CREDIT_CARD(card_num, name, postal_code) VALUES (?, ?, ?);', (c, n, pc,))
+            payment = crsr.execute('SELECT MAX(cid) FROM CREDIT_CARD').fetchone()[0] #MAX(cid) will get the most recent since we are using autoincrement
+        else:
+            print("Error with Payment. Returning to Menu...")
+            return()
+
+    crsr.execute("INSERT INTO ORDER_TABLE(username, payment) VALUES(?,?);", (logged_in, payment, ))
+    new_onum = crsr.execute('SELECT MAX(onum) FROM ORDER_TABLE').fetchone()[0]
+
+    for i in range(len(cart)):
+        crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(?,?, ?);", (new_onum, cart[i][0], cartq[cart[i][0]]))
+        print(new_onum, cart[i][0])
+
+    connection.commit()
+    cart.clear()
+    cartq.clear()
     print("Checking Out...")
+    print("Order Number:", new_onum)
+
 
 def viewcart():
     if(cart):
         total = 0
         for i in range(len(cart)):
-            print(i+1, cart[i][1], cart[i][2])
-            total += cart[i][2]
+            print(i+1, cart[i][1], cart[i][2], "(x", cartq[cart[i][0]], ")")
+            total += cart[i][2] * cartq[cart[i][0]]
         print("-----\nTotal: ", total)
         remove = input("Would you like to remove a book? (y/n)")
         if(remove == "y" or remove == "Y"):
             remove = input("Type number corresponding to book to remove from cart: ")
             if(remove.isdigit() and int(remove) <= len(remove)+1):
-                cart.pop(int(remove)-1)
+                if(cartq[cart[int(remove)-1][0]] == 1):
+                    cartq.pop(cart[int(remove)-1][0])
+                    cart.pop(int(remove)-1)
+                else:
+                    cartq[cart[int(remove)-1][0]] -= 1
                 viewcart()
                 return()
             else:
@@ -274,7 +319,7 @@ def viewcart():
                 return()
         cout = input("Would you like to check out now? (y/n) ")
         if(cout == "y" or cout == "Y"):
-            checkout()
+            checkout(total)
         else:
             print("Returning to Menu...")
     else:
@@ -284,15 +329,20 @@ def viewcart():
 def viewreports():
     print("Viewing Reports...")
 
+def trackorder():
+    print("trackorder")
+
 while(True):
     print("\nWelcome to TheBookStore.\nPlease choose an option from the following menu: ")
     if(logged_in != False and is_admin == False):
-        option = input(" (1) Browse Our Collection \n (2) View Cart \n (3) Exit Store \n")
+        option = input(" (1) Browse Our Collection \n (2) View Cart \n (3) Track Order \n (4) Exit Store \n")
         if(option == "1"):
             browse()
         elif(option == "2"):
             viewcart()
         elif(option == "3"):
+            trackorder()
+        elif(option == "4"):
             print("Exiting Program ...")
             break;
         else:

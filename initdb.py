@@ -73,8 +73,8 @@ crsr.execute(createUserTable);
 createOrderTable = """CREATE TABLE IF NOT EXISTS ORDER_TABLE(
   onum                INTEGER PRIMARY KEY AUTOINCREMENT,
   tracking_num        INT,
-  username            VARCHAR(50),
-  payment             INT,
+  username            VARCHAR(50) NOT NULL,
+  payment             INT NOT NULL,
   date                TEXT,
   FOREIGN KEY (payment)
     REFERENCES CREDIT_CARD(cid),
@@ -84,8 +84,9 @@ createOrderTable = """CREATE TABLE IF NOT EXISTS ORDER_TABLE(
 crsr.execute(createOrderTable);
 
 createContainsTable = """CREATE TABLE IF NOT EXISTS ORDER_CONTAINS(
-  onum    INT,
-  ISBN    CHAR(13),
+  onum     INT,
+  ISBN     CHAR(13),
+  quantity INT,
   PRIMARY KEY(onum, ISBN),
   FOREIGN KEY (ISBN)
     REFERENCES BOOK(ISBN),
@@ -125,6 +126,23 @@ crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0141439513, 'Classics'),(
 #crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 18.95, 17, ?, 0.18);""", (example_pid2,))
 #crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 8.25, 23, ?, 0.07);""", (example_pid2,))
 #crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 15.25, 19, ?, 0.11);""", (example_pid1,))
+
+crsr.execute("""
+CREATE TRIGGER decrease_stock
+  AFTER INSERT ON ORDER_CONTAINS
+  BEGIN
+    UPDATE BOOK SET stock = stock - NEW.quantity WHERE BOOK.ISBN = NEW.ISBN;
+  END;
+""")
+
+crsr.execute("""
+CREATE TRIGGER order_time
+  AFTER INSERT ON ORDER_TABLE
+  BEGIN
+    UPDATE ORDER_TABLE SET date = DATETIME('NOW') WHERE ORDER_TABLE.onum = NEW.onum;
+    UPDATE ORDER_TABLE SET tracking_num = abs(random()) WHERE ORDER_TABLE.onum = NEW.onum;
+  END;
+""")
 
 connection.commit();
 # close the connection
