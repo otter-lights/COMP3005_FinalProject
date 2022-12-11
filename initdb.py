@@ -9,7 +9,7 @@ print("Connected to the database")
 # SQL command to create a table in the database
 createPubInfoTable = """CREATE TABLE IF NOT EXISTS PUBLISHER_INFO(
   pid       INTEGER PRIMARY KEY AUTOINCREMENT,
-  name      VARCHAR(255) UNIQUE NOT NULL,
+  name      VARCHAR(255) NOT NULL,
   address   VARCHAR(255),
   email     VARCHAR(255),
   phone_num CHAR(10),

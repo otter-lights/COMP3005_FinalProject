@@ -56,7 +56,12 @@ def selection(results):
                 print("Added to Cart", info[0])
         elif(logged_in != False and is_admin == True):
             #delete BOOK
-            print("admin")
+            delete = input(f"Would you like to delete {info[1]} from store? (y/n) ")
+            if(delete == "y" or delete == "Y"):
+                crsr.execute("DELETE FROM BOOK WHERE ISBN=?;", (info[0],))
+                crsr.execute("DELETE FROM AUTHORS WHERE ISBN=?;", (info[0],))
+                crsr.execute("DELETE FROM GENRES WHERE ISBN=?;", (info[0],))
+                connection.commit()
         else:
             #not logged in
             print("Add to Cart Not Available (Not Logged In). Returning to Search Menu...")
@@ -109,7 +114,6 @@ def login():
     password = input("Password: ")
     crsr.execute("SELECT uid, password, is_admin FROM USER_TABLE WHERE email=?", (email,))
     ans = crsr.fetchone()
-    print(ans)
     if(not ans):
         print("No account exists with that email.\nReturning to menu...")
         return(False, False)
@@ -161,21 +165,112 @@ def createaccount():
     print("Creating Account...")
     return(new_user)
 
+def addPublisher(pub_name):
+    bank_num = input(" Bank Number (10 Digits): ")
+    if(len(bank_num) != 10):
+        print("Incorrect Input. Returning to Menu...")
+        return("error")
+    contact = input(" Would you like to add contact information? (y/n) ")
+    if(contact == "y" or contact == "Y"):
+        address = input(" Address: ")
+        email = input(" Email: ")
+        phone_num = input(" Phone Number (10 Digits): ")
+        if(len(phone_num) != 10):
+            print("Incorrect Input. Returning to Menu...")
+            return("error")
+        crsr.execute('INSERT INTO PUBLISHER_INFO(name, address, email, phone_num, bank_num) VALUES(?,?,?,?,?);', (pub_name, address, email, phone_num, bank_num,))
+    else:
+        crsr.execute('INSERT INTO PUBLISHER_INFO(name, bank_num) VALUES(?,?);', (pub_name, bank_num,))
+
+    connection.commit()
+    new = crsr.execute('SELECT MAX(pid) FROM PUBLISHER_INFO').fetchone()[0]
+    print("Creating Publisher Info...")
+    return(new)
+
 def addbooks():
     while(True):
-        #ask ISBN
-        #ask title
-        #ask year_pub and num_pages (optional)
-        #ask author(s)
-        #ask genre(s)
-        #ask price
-        #ask stock
-        #ask publisher name (and look up), if not exist make new PUBLISHER_INFO
-        #ask pub_cut
+        isbn = input(" ISBN: ")
+        title = input(" Title: ")
+        year_pub = input(" Year Published: ")
+        num_pages = input(" Num Pages: ")
+        price = input(" Price: ")
+        stock = input(" Staring Stock: ")
+
+        pub_name = input(" Publisher Name: ")
+        crsr.execute("SELECT * FROM PUBLISHER_INFO WHERE name=?", (pub_name,))
+        options = crsr.fetchall()
+        if(len(options) == 1):
+            print("Returned Publisher Information: ", options)
+            test = input("Is this correct? (y/n) ")
+            if(test == "y" or test == "Y"):
+                pid = options[0][0]
+            elif(test == "n" or test == "N"):
+                new = input("Would you like to make a new publisher record under this name? (y/n) ")
+                if(new == "y" or new == "Y"):
+                    pid = addPublisher(pub_name)
+                    if(pid == "error"):
+                        print("Returning to Menu...")
+                        break
+            else:
+                print("Input Not Recognized. Returning to Menu...")
+                break
+        elif(len(options) == 0):
+            new = input("No Match. Would you like to make a new publisher record under this name? (y/n) ")
+            if(new == "y" or new == "Y"):
+                pid = addPublisher(pub_name)
+                if(pid == "error"):
+                    print("Returning to Menu...")
+                    break
+            else:
+                print("Returning to Menu...")
+                break
+        else:
+            print(" Multiple Publishers with Matching Name: ")
+            for i in range(1, len(options)+1):
+                print(i, options[i-1])
+            print(len(options)+2, "Create New Publisher Record")
+            sel = input(" Selection, choices above: ")
+            if(sel == str(len(options)+2)):
+                pid = addPublisher(pub_name)
+                if(pid == "error"):
+                    print("Returning to Menu...")
+                    break
+            elif(sel.isdigit() and int(sel) < len(results)+1):
+                pid = options[sel-1]
+                print(pid)
+            else:
+                print("Input Not Recognized. Returning to Menu...")
+                break
+
+        pub_cut = input(" Publisher Percent Cut: ")
+        print(" Prompt for author name will repeat (for multiple authors) until 'q' is submitted to end." )
+        authors = []
+        while(True):
+            author = input(" Author Name: ")
+            if(author == "q" or author == "Q"):
+                break
+            authors.append(author)
+
+        print(" Genre tag prompt will repeat (until 'q'), write one on each line." )
+        genres = []
+        while(True):
+            genre = input(" Genre: ")
+            if(genre == "q" or genre == "Q"):
+                break
+            genres.append(genre)
+
+        crsr.execute("INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(?,?,?,?,?,?,?,?);", (isbn, title, year_pub, num_pages, price, stock, pid, pub_cut))
+        for i in range(len(authors)):
+            crsr.execute("INSERT INTO AUTHORS(ISBN, author_name) VALUES(?,?);", (isbn, authors[i],))
+        for i in range(len(genres)):
+            crsr.execute("INSERT INTO GENRES(ISBN, genre) VALUES(?,?);", (isbn, genres[i],))
+
+        connection.commit()
 
         end = input("Would you like to add another book? (y/n) ")
         if(end == "n" or end == "N"):
             break
+
 
 def checkout():
     print("Checking Out...")
