@@ -75,7 +75,9 @@ createOrderTable = """CREATE TABLE IF NOT EXISTS ORDER_TABLE(
   tracking_num        INT,
   username            VARCHAR(50) NOT NULL,
   payment             INT NOT NULL,
-  date                TEXT,
+  delivery_address    VARCHAR(255) NOT NULL,
+  date_placed         TEXT,
+  est_arrival         TEXT,
   FOREIGN KEY (payment)
     REFERENCES CREDIT_CARD(cid),
   FOREIGN KEY (username)
@@ -95,8 +97,8 @@ createContainsTable = """CREATE TABLE IF NOT EXISTS ORDER_CONTAINS(
 );"""
 crsr.execute(createContainsTable);
 
-admin_account = """INSERT INTO USER_TABLE(username, email, password, is_admin) VALUES ('grbookworm1818', 'admin@thebookstore.com', 'password', 1);"""
-crsr.execute(admin_account);
+crsr.execute("""INSERT INTO USER_TABLE(username, email, password, is_admin) VALUES ('grbookworm1818', 'admin@thebookstore.com', 'password', 1);""");
+crsr.execute("INSERT INTO CREDIT_CARD(card_num, name, postal_code) VALUES (1234123412, 'Gertrude Robinson', 123123)")
 
 crsr.execute("""INSERT INTO PUBLISHER_INFO(name, bank_num) VALUES('Harper-Collins', 1234567890);""")
 crsr.execute("""INSERT INTO PUBLISHER_INFO(name, bank_num) VALUES('Penguin Random House', 1234512345);""")
@@ -105,19 +107,19 @@ crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock,
 crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0571056865, 'William Golding')""")
 crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0571056865, 'YA'),(0571056865, 'Allegorical')""")
 
-crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0142424170, 'The Fault in Our Stars', 2012, 352, 19.95, 20, 'Harper-Collins', 0.05);""")
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0142424170, 'The Fault in Our Stars', 2012, 352, 19.95, 20, 'Harper-Collins', 0.45);""")
 crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0142424170, 'John Green')""")
 crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0142424170, 'YA'),(0142424170, 'Romance')""")
 
-crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0063071657, 'Heres To Us', 2021, 448, 24.95, 18, 'Harper-Collins', 0.35);""")
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0063071657, 'Heres To Us', 2021, 448, 24.95, 18, 'Harper-Collins', 0.85);""")
 crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0063071657, 'Becky Albertalli'),(0063071657, 'Adam Silvera')""")
 crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0063071657, 'YA'),(0063071657, 'Romance'),(0063071657, 'LGBT')""")
 
-crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0062457799, 'They Both Die At The End', 2018, 389, 9.95, 11, 'Penguin Random House', 0.15);""")
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0062457799, 'They Both Die At The End', 2018, 389, 9.95, 11, 'Penguin Random House', 0.75);""")
 crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0062457799, 'Adam Silvera')""")
 crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0062457799, 'YA'),(0062457799, 'Romance'),(0062457799, 'LGBT')""")
 
-crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0141439513, 'Pride and Prejudice', 1813, 279, 15.49, 5, 'Penguin Random House', 0.10);""")
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0141439513, 'Pride and Prejudice', 1813, 279, 15.49, 6, 'Penguin Random House', 0.60);""")
 crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0141439513, 'Jane Austen')""")
 crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0141439513, 'Classics'),(0141439513, 'Romance')""")
 
@@ -126,6 +128,15 @@ crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0141439513, 'Classics'),(
 #crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 18.95, 17, ?, 0.18);""", (example_pid2,))
 #crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 8.25, 23, ?, 0.07);""", (example_pid2,))
 #crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 15.25, 19, ?, 0.11);""", (example_pid1,))
+
+crsr.execute("INSERT INTO ORDER_TABLE(username, payment, delivery_address, date_placed) VALUES('grbookworm1818', 1, 'The Magnus Institute, London', '2016-04-01 20:13:20')")
+crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(1, 0141439513, 5)")
+
+crsr.execute("INSERT INTO ORDER_TABLE(username, payment, delivery_address, date_placed) VALUES('grbookworm1818', 1, 'The Magnus Institute, London', '2016-04-12 20:13:20')")
+crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(2, 0062457799, 2)")
+
+crsr.execute("INSERT INTO ORDER_TABLE(username, payment, delivery_address, date_placed) VALUES('grbookworm1818', 1, 'The Magnus Institute, London', '2018-03-18 20:13:20')")
+crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(3, 0142424170, 2)")
 
 crsr.execute("""
 CREATE TRIGGER decrease_stock
@@ -139,8 +150,20 @@ crsr.execute("""
 CREATE TRIGGER order_time
   AFTER INSERT ON ORDER_TABLE
   BEGIN
-    UPDATE ORDER_TABLE SET date = DATETIME('NOW') WHERE ORDER_TABLE.onum = NEW.onum;
+    UPDATE ORDER_TABLE SET date_placed = DATETIME('NOW') WHERE ORDER_TABLE.onum = NEW.onum;
     UPDATE ORDER_TABLE SET tracking_num = abs(random()) WHERE ORDER_TABLE.onum = NEW.onum;
+    UPDATE ORDER_TABLE SET est_arrival = DATETIME(date_placed, '+10 days') WHERE ORDER_TABLE.onum = NEW.onum;
+  END;
+""")
+
+crsr.execute("""
+CREATE TRIGGER reorder_check
+  AFTER UPDATE ON BOOK WHEN New.stock < 5
+  BEGIN
+    UPDATE BOOK SET stock = (SELECT SUM(ORDER_CONTAINS.quantity)
+                                    FROM ORDER_CONTAINS JOIN ORDER_TABLE ON ORDER_CONTAINS.onum = ORDER_TABLE.onum
+                                    WHERE ORDER_CONTAINS.ISBN = New.ISBN AND strftime('%Y-%m', date_placed) = strftime('%Y-%m', DATETIME('NOW')))
+                       WHERE BOOK.ISBN = NEW.ISBN;
   END;
 """)
 

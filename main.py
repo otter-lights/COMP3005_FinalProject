@@ -257,14 +257,52 @@ def addbooks():
             break
 
 def checkout(total):
+    daddress = input("Would you like to use your default address? (y/n) ")
+    if(daddress == "y" or daddress == "Y"):
+        crsr.execute("SELECT address FROM USER_TABLE WHERE username=?;", (logged_in,))
+        address = crsr.fetchone()[0]
+        if(address == None):
+            print("No Default Address Set.")
+            makeaddress = input("Would you like to input a new address? (y/n) ")
+            if(makeaddress == "y" or makeaddress == "Y"):
+                address = input("Address: ")
+            else:
+                print("Error with Address. Returning to Menu...")
+                return()
+    else:
+        makeaddress = input("Would you like to input a new address? (y/n) ")
+        if(makeaddress == "y" or makeaddress == "Y"):
+            address = input("Address: ")
+        else:
+            print("Error with Address. Returning to Menu...")
+            return()
     default = input("Would you like to use your default card to check out? (y/n) ")
     if(default == "y" or default == "Y"):
         crsr.execute("SELECT default_card FROM USER_TABLE WHERE username=?;", (logged_in,))
         payment = crsr.fetchone()[0]
+        if(payment == None):
+            print("No Default Card Set.")
+            makecard = input("Would you like to input a new card? (y/n) ")
+            if(makecard == "y" or makecard == "Y"):
+                while(True):
+                    c = input("Card Number (10 Characters): ")
+                    if(len(c) == 10):
+                        break
+                n = input("Name on Card: ")
+                while(True):
+                    pc = input("Postal Code for Card (6 Characters): ")
+                    if(len(pc) == 6):
+                        break
+
+                crsr.execute('INSERT INTO CREDIT_CARD(card_num, name, postal_code) VALUES (?, ?, ?);', (c, n, pc,))
+                payment = crsr.execute('SELECT MAX(cid) FROM CREDIT_CARD').fetchone()[0] #MAX(cid) will get the most recent since we are using autoincrement
+            else:
+                print("Error with Payment. Returning to Menu...")
+                return()
         print("CARD ID: ", payment)
     else:
         makecard = input("Would you like to input a new card? (y/n) ")
-        if(markcard == "y" or markcard == "Y"):
+        if(makecard == "y" or makecard == "Y"):
             while(True):
                 c = input("Card Number (10 Characters): ")
                 if(len(c) == 10):
@@ -281,11 +319,12 @@ def checkout(total):
             print("Error with Payment. Returning to Menu...")
             return()
 
-    crsr.execute("INSERT INTO ORDER_TABLE(username, payment) VALUES(?,?);", (logged_in, payment, ))
+    crsr.execute("INSERT INTO ORDER_TABLE(username, payment, delivery_address) VALUES(?,?,?);", (logged_in, payment, address, ))
     new_onum = crsr.execute('SELECT MAX(onum) FROM ORDER_TABLE').fetchone()[0]
 
     for i in range(len(cart)):
-        crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(?,?, ?);", (new_onum, cart[i][0], cartq[cart[i][0]]))
+        print(new_onum, cart[i][0], cartq[cart[i][0]])
+        crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(?,?, 1);", (new_onum, cart[i][0]))
         print(new_onum, cart[i][0])
 
     connection.commit()
@@ -327,10 +366,50 @@ def viewcart():
         return()
 
 def viewreports():
-    print("Viewing Reports...")
+    report = input(" (1) Income vs Profit, per Month \n (2) Income vs Profit, per Author \n (3) Income vs Profit, per Genre \n")
+    if(report == "1"):
+        crsr.execute("""
+            SELECT strftime('%Y-%m', date_placed) year_month, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
+            FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN
+            GROUP BY year_month;
+        """)
+        print("Year-Month | Num Sales | Income | Profit")
+        for row in crsr.fetchall():
+            print(row[0], "|", row[1], "|", row[2], "|", row[3])
+    elif(report == "2"):
+        crsr.execute("""
+            SELECT author_name, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
+            FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN JOIN AUTHORS ON BOOK.ISBN = AUTHORS.ISBN
+            GROUP BY author_name;
+        """)
+        print("Author | Num Sales | Income | Profit")
+        for row in crsr.fetchall():
+            print(row[0], "|", row[1], "|", row[2], "|", row[3])
+    elif(report == "3"):
+        crsr.execute("""
+            SELECT genre, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
+            FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN JOIN GENRES ON BOOK.ISBN = GENRES.ISBN
+            GROUP BY genre;
+        """)
+        print("Genre | Num Sales | Income | Profit")
+        for row in crsr.fetchall():
+            print(row[0], "|", row[1], "|", row[2], "|", row[3])
+    else:
+        print("Input Not Recognized. Returning to Menu...")
 
 def trackorder():
-    print("trackorder")
+    onum = input("Type Order Number to View Tracking ID: ")
+    crsr.execute("SELECT tracking_num, est_arrival, delivery_address FROM ORDER_TABLE WHERE onum=? AND username=?;", (onum,logged_in,))
+    tracking_info = crsr.fetchone()
+    if(tracking_info):
+        print("Tracking Number:", tracking_info[0]);
+        print("Estimated Arrival:", tracking_info[1]);
+        print("Delivery Address:", tracking_info[2])
+    else:
+        print("Provided order number not valid")
+    another = input("Would you like to track another order? (y/n) ")
+    if(another == "y" or another == "Y"):
+        trackorder()
 
 while(True):
     print("\nWelcome to TheBookStore.\nPlease choose an option from the following menu: ")
