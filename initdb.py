@@ -124,11 +124,25 @@ crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock,
 crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0141439513, 'Jane Austen')""")
 crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0141439513, 'Classics'),(0141439513, 'Romance')""")
 
-#crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 30.49, 12, ?, 0.12);""", (example_pid2,))
-#crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 35.95, 8, ?, 0.40);""", (example_pid1,))
-#crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 18.95, 17, ?, 0.18);""", (example_pid2,))
-#crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 8.25, 23, ?, 0.07);""", (example_pid2,))
-#crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pid, pub_cut) VALUES(0571056865, 'Lord of the Flies', 1954, 224, 15.25, 19, ?, 0.11);""", (example_pid1,))
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(9780486278, 'The Picture of Dorian Grey', 1891, 176, 6.49, 7, 'Penguin Random House', 0.64);""")
+crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(9780486278, 'Oscar Wilde')""")
+crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(9780486278, 'Classics'),(9780486278, 'Gothic')""")
+
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(‎0553573403, 'Game of Thrones', 1997, 864, 13.59, 10, 'Penguin Random House', 0.50);""")
+crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(‎0553573403, 'George R R Martin')""")
+crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(‎0553573403, 'Fantasy'),(‎0553573403, 'Medieval')""")
+
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(1524796280, 'Fire and Blood', 2018, 736, 47.00, 6, 'Penguin Random House', 0.35);""")
+crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(‎1524796280, 'George R R Martin')""")
+crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(‎1524796280, 'Fantasy'),(‎1524796280, 'Medieval'),(‎1524796280, 'History')""")
+
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0441172717, 'Dune', 1990, 896, 11.58, 16, 'Harper-Collins', 0.52);""")
+crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0441172717, 'Frank Herbert')""")
+crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0441172717, 'Fantasy'),(0441172717, 'Science Fiction')""")
+
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0060853980, 'Good Omens: The Nice and Accurate Prophecies of Agnes Nutter, Witch', 2006, 512, 18.42, 8, 'Harper-Collins', 0.52);""")
+crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0060853980, 'Neil Gaiman'), (0060853980, 'Terry Pratchett')""")
+crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0060853980, 'Fantasy'),(0060853980, 'Comedy')""")
 
 crsr.execute("INSERT INTO ORDER_TABLE(username, payment, delivery_address, date_placed) VALUES('grbookworm1818', 1, 'The Magnus Institute, London', '2016-04-01 20:13:20')")
 crsr.execute("INSERT INTO ORDER_CONTAINS(onum, ISBN, quantity) VALUES(1, 0141439513, 5)")
