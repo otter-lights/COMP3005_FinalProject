@@ -12,7 +12,10 @@ def selection(results):
     for i in range(1, len(results)+1):
         book = results[i-1]
         isbn = book[0]
-        print(i, book[1], book[2])
+        print(i, book[1], "$", book[2])
+    if(len(results) == 0):
+        print("No Results")
+        return()
     selection = input("Enter number of book to select: ")
     if(selection.isdigit() and int(selection) < len(results)+1):
         choice = results[int(selection)-1]
@@ -102,7 +105,7 @@ def browse():
         else:
             print("input was not understood, please try again")
             continue
-        end = input(" (1) Return To Menu \n (2) New Search \n ") #POTENTIALLY ADD OPTION TO REDO LAST SEARCH
+        end = input("\n (1) Return To Menu \n (2) New Search \n ") #POTENTIALLY ADD OPTION TO REDO LAST SEARCH
         if(end == "1"):
             print("Returning To Menu ...")
             break
@@ -363,36 +366,40 @@ def viewcart():
         return()
 
 def viewreports():
-    report = input(" (1) Income vs Profit, per Month \n (2) Income vs Profit, per Author \n (3) Income vs Profit, per Genre \n")
-    if(report == "1"):
-        crsr.execute("""
-            SELECT strftime('%Y-%m', date_placed) year_month, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
-            FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN
-            GROUP BY year_month;
-        """)
-        print("Year-Month | Num Sales | Income | Profit")
-        for row in crsr.fetchall():
-            print(row[0], "|", row[1], "|", row[2], "|", row[3])
-    elif(report == "2"):
-        crsr.execute("""
-            SELECT author_name, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
-            FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN JOIN AUTHORS ON BOOK.ISBN = AUTHORS.ISBN
-            GROUP BY author_name;
-        """)
-        print("Author | Num Sales | Income | Profit")
-        for row in crsr.fetchall():
-            print(row[0], "|", row[1], "|", row[2], "|", row[3])
-    elif(report == "3"):
-        crsr.execute("""
-            SELECT genre, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
-            FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN JOIN GENRES ON BOOK.ISBN = GENRES.ISBN
-            GROUP BY genre;
-        """)
-        print("Genre | Num Sales | Income | Profit")
-        for row in crsr.fetchall():
-            print(row[0], "|", row[1], "|", row[2], "|", row[3])
-    else:
-        print("Input Not Recognized. Returning to Menu...")
+    while(True):
+        report = input(" (1) Income vs Profit, per Month \n (2) Income vs Profit, per Author \n (3) Income vs Profit, per Genre \n")
+        if(report == "1"):
+            crsr.execute("""
+                SELECT strftime('%Y-%m', date_placed) year_month, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
+                FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN
+                GROUP BY year_month;
+            """)
+            print("Year-Month | Num Sales | Income | Profit")
+            for row in crsr.fetchall():
+                print(row[0], "|", row[1], "|", row[2], "|", row[3])
+        elif(report == "2"):
+            crsr.execute("""
+                SELECT author_name, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
+                FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN JOIN AUTHORS ON BOOK.ISBN = AUTHORS.ISBN
+                GROUP BY author_name;
+            """)
+            print("Author | Num Sales | Income | Profit")
+            for row in crsr.fetchall():
+                print(row[0], "|", row[1], "|", row[2], "|", row[3])
+        elif(report == "3"):
+            crsr.execute("""
+                SELECT genre, SUM(quantity), SUM(price * quantity), SUM((price - (price * pub_cut)) * quantity)
+                FROM ORDER_TABLE JOIN ORDER_CONTAINS ON ORDER_CONTAINS.onum = ORDER_TABLE.onum JOIN BOOK ON ORDER_CONTAINS.ISBN = BOOK.ISBN JOIN GENRES ON BOOK.ISBN = GENRES.ISBN
+                GROUP BY genre;
+            """)
+            print("Genre | Num Sales | Income | Profit")
+            for row in crsr.fetchall():
+                print(row[0], "|", row[1], "|", row[2], "|", row[3])
+        else:
+            print("Input Not Recognized.")
+        view = input(" Would you like to view reports again? (y/n) ")
+        if(view == "n" or view == "N"):
+            break
 
 def trackorder():
     onum = input("Type Order Number to View Tracking ID: ")

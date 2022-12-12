@@ -128,13 +128,13 @@ crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock,
 crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(9780486278, 'Oscar Wilde')""")
 crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(9780486278, 'Classics'),(9780486278, 'Gothic')""")
 
-crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(‎0553573403, 'Game of Thrones', 1997, 864, 13.59, 10, 'Penguin Random House', 0.50);""")
-crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(‎0553573403, 'George R R Martin')""")
-crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(‎0553573403, 'Fantasy'),(‎0553573403, 'Medieval')""")
+crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0553573403, 'Game of Thrones', 1997, 864, 13.59, 10, 'Penguin Random House', 0.50);""")
+crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0553573403, 'George R R Martin')""")
+crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(0553573403, 'Fantasy'),(0553573403, 'Medieval')""")
 
 crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(1524796280, 'Fire and Blood', 2018, 736, 47.00, 6, 'Penguin Random House', 0.35);""")
-crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(‎1524796280, 'George R R Martin')""")
-crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(‎1524796280, 'Fantasy'),(‎1524796280, 'Medieval'),(‎1524796280, 'History')""")
+crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(1524796280, 'George R R Martin')""")
+crsr.execute("""INSERT INTO GENRES(ISBN, genre) VALUES(1524796280, 'Fantasy'),(1524796280, 'Medieval'),(1524796280, 'History')""")
 
 crsr.execute("""INSERT INTO BOOK(ISBN, title, year_pub, num_pages, price, stock, pub_name, pub_cut) VALUES(0441172717, 'Dune', 1990, 896, 11.58, 16, 'Harper-Collins', 0.52);""")
 crsr.execute("""INSERT INTO AUTHORS(ISBN, author_name) VALUES(0441172717, 'Frank Herbert')""")
@@ -184,5 +184,4 @@ CREATE TRIGGER reorder_check
 """)
 
 connection.commit();
-# close the connection
 connection.close();
